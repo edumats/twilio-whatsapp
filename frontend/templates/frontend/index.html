@@ -1,0 +1,15 @@
+{% extends "frontend/layout.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Painel Bike123
+{% endblock %}
+
+{% block body %}
+    <form id="main-form" class="mt-4 ml-3" action="{% url 'send' %}" method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input class="btn btn-primary" type="submit" name="" value="Enviar notificação">
+    </form>
+
+{% endblock %}

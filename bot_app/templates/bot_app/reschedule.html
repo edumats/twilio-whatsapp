@@ -1,0 +1,17 @@
+{% extends "frontend/layout.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Reagendamento
+{% endblock %}
+
+{% block body %}
+    <form id="main-form" class="mt-4 ml-3" action="{% url 'reschedule' %}" method="post">
+        {% csrf_token %}
+        {{ create_user_form|crispy }}
+        {{ create_mechanic_form|crispy }}
+        {{ appointment_form|crispy }}
+        <input type="text" name="customer-id" value="{{ customer_id }}" hidden>
+        <input class="btn btn-primary" type="submit"  value="Enviar">
+    </form>
+{% endblock %}

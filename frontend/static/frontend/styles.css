@@ -1,0 +1,32 @@
+* {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: none;
+}
+
+html {
+    font-size: 100%;
+}
+
+form > input[type=text], input[type=number], input[type=email] {
+    width: 90vw;
+}
+
+.select {
+    width: 90vw;
+}
+
+.textarea {
+    background-color: red;
+}
+
+@media (min-width: 768px) {
+    form > input[type=text], input[type=number], input[type=email] {
+        max-width: 60vw;
+    }
+
+    .select, .textarea {
+        max-width: 60vw;
+    }
+}
