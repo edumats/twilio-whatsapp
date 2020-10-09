@@ -1,0 +1,41 @@
+{% extends "bot_app/layout.html" %}
+
+{% block title %}
+    Lista de Serviços Agendados
+{% endblock %}
+
+{% block body %}
+    <h1 class="my-4">Lista de Serviços</h1>
+    {% if appointment_list %}
+        <table class="table table-striped my-4">
+            <thead>
+                <tr>
+                    <th scope="col">Status</th>
+                    <th scope="col">Serviço</th>
+                    <th scope="col">Cliente</th>
+                    <th scope="col">Mecânico</th>
+                    <th scope="col">Iniciado</th>
+                    <th scope="col">Agendado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in appointment_list %}
+                    <tr>
+                        <td>
+                            <a href="{{appointment.get_absolute_url}}">
+                                {{appointment.get_status_display}}
+                            </a>
+                        </td>
+                        <td>{{appointment.get_type_display}}</td>
+                        <td><a href="{% url 'customer-detail' appointment.customer.pk %}">{{appointment.customer}}</a></td>
+                        <td>{{appointment.mechanic}}</td>
+                        <td>{{appointment.date_initiated|date:'N d, H:i A'}}</td>
+                        <td>{{appointment.date_scheduled|date:'N d, H:i A'}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Não há serviços salvos</p>
+    {% endif %}
+{% endblock %}

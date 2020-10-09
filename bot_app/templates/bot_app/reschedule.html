@@ -1,4 +1,4 @@
-{% extends "frontend/layout.html" %}
+{% extends "bot_app/layout.html" %}
 {% load crispy_forms_tags %}
 
 {% block title %}
@@ -6,11 +6,10 @@
 {% endblock %}
 
 {% block body %}
+    <h1>Modificar meu agendamento</h1>
     <form id="main-form" class="mt-4 ml-3" action="{% url 'reschedule' %}" method="post">
         {% csrf_token %}
-        {{ create_user_form|crispy }}
-        {{ create_mechanic_form|crispy }}
-        {{ appointment_form|crispy }}
+        {{ form|crispy }}
         <input type="text" name="customer-id" value="{{ customer_id }}" hidden>
         <input class="btn btn-primary" type="submit"  value="Enviar">
     </form>

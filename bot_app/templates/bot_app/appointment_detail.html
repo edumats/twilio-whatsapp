@@ -1,0 +1,37 @@
+{% extends "bot_app/layout.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Detalhes do Serviço
+{% endblock %}
+
+{% block body %}
+    <a href="{% url 'appointments' %}">Voltar para lista de serviços</a>
+    <hr>
+    <h1>{{ appointment.get_type_display }}</h1>
+
+    <p><strong>Cliente: </strong> <a href="{% url 'customer-detail' appointment.customer.pk %}">{{ appointment.customer }}</a></p>
+    <p><strong>Telefone do cliente: </strong>{{ appointment.customer.phone_number }}</p>
+    <p><strong>E-mail do cliente: </strong>{{ appointment.customer.email }}</p>
+    <p><strong>Endereço do serviço: </strong>{{ appointment.customer.address }}</p>
+    <hr>
+    <p><strong>Mecânico: </strong> {{ appointment.mechanic }}</p>
+    <p><strong>Iniciado: </strong> {{ appointment.date_initiated|date:'N d Y, H:i A' }}</p>
+    <p><strong>Agendado: </strong> {{ appointment.date_scheduled|date:'N d Y, H:i A' }}</p>
+    <form class="mb-2" method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input type="submit" class="btn btn-primary" value="Salvar">
+    </form>
+    {% if appointment.comments %}
+        <p><strong>Comentários: </strong> {{ appointment.comments }}</p>
+    {% else %}
+        <p>Não há comentários</p>
+    {% endif %}
+    <p class="text-muted">
+        <small><strong>ID: </strong>{{ appointment.id }}</small>
+    </p>
+    <hr>
+
+
+{% endblock %}

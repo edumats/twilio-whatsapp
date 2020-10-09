@@ -1,10 +1,9 @@
 from django.core.mail import send_mail, BadHeaderError
 from django.conf import settings
 
-def send_gmail(message, customer_email):
-    subject = 'Agendamento Bike123'
+def send_gmail(customer_email, subject, message):
     email_from = settings.EMAIL_HOST_USER
-    recipient_list = ['eduardo.mats@gmail.com']
+    recipient_list = [customer_email]
     try:
         result = send_mail(subject, message, email_from, recipient_list)
     except BadHeaderError:

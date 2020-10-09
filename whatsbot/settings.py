@@ -38,8 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bot_app',
-    'frontend',
     'crispy_forms',
+    'tempus_dominus',
 ]
 
 MIDDLEWARE = [
@@ -113,6 +113,8 @@ TIME_ZONE = 'America/Sao_Paulo'
 USE_I18N = True
 
 USE_L10N = True
+# USE_L10N = False
+# DATETIME_INPUT_FORMATS = '%d/%m/%Y %H:%M'
 
 USE_TZ = True
 
@@ -133,3 +135,6 @@ EMAIL_PORT = 587
 
 # Selects bootstrap 4 for crispy forms
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# DateTime picker use locale format
+TEMPUS_DOMINUS_LOCALIZE = True

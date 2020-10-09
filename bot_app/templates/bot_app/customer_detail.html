@@ -1,0 +1,69 @@
+{% extends "bot_app/layout.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Detalhes do Cliente
+{% endblock %}
+
+{% block body %}
+    <a href="{% url 'appointments' %}">Voltar para lista de serviços</a>
+    <hr>
+    <h1 class="my-3">{{ customer.name }}</h1
+    <p><strong>Usuário criado em: </strong> {{ customer.date_created|date:'N d Y, H:i A' }}</p>
+
+    <h3 class="my-3">Contato</h3>
+    <p><strong>Telefone: </strong> {{ customer.phone_number }}</p>
+    <p><strong>E-mail: </strong> {{ customer.email }}</p>
+    <p><strong>Endereço: </strong> {{ customer.address }}</p>
+    <hr>
+    <h3>Serviços Realizados</h3>
+    {% if customer.appointment_set.all %}
+    <table class="table table-striped my-4">
+        <thead>
+            <tr>
+                <th scope="col">Status</th>
+                <th scope="col">Serviço</th>
+                <th scope="col">Mecânico</th>
+                <th scope="col">Iniciado</th>
+                <th scope="col">Agendado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for appointment in customer.appointment_set.all %}
+                <tr>
+                    <td>{{appointment.get_status_display}}</td>
+                    <td>{{appointment.get_type_display}}</td>
+                    <td>{{appointment.mechanic}}</td>
+                    <td>{{appointment.date_initiated}}</td>
+                    <td>{{appointment.date_scheduled}}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>Não há serviços agendados</p>
+    {% endif %}
+
+    <h3>Mensagens recebidas</h3>
+    {% if customer.message_set.all %}
+        <table class="table table-striped my-4">
+            <thead>
+                <tr>
+                    <th>Mensagem</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for message in customer.message_set.all %}
+                    <tr>
+                        <td>{{message.message}}</td>
+                        <td>{{message.date_created}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Não há mensagens registradas</p>
+    {% endif %}
+
+{% endblock %}

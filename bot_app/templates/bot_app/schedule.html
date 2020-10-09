@@ -1,0 +1,48 @@
+{% extends "bot_app/layout.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Painel Bike123
+{% endblock %}
+
+{% block body %}
+    <head>
+    <!-- Font Awesome -->
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+    <!-- Moment.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js" integrity="sha256-VBLiveTKyUZMEzJd6z2mhfxIqz3ZATCuVMawPZGzIfA=" crossorigin="anonymous"></script>
+
+    <!-- Tempus Dominus Bootstrap 4 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/css/tempusdominus-bootstrap-4.min.css" integrity="sha256-XPTBwC3SBoWHSmKasAk01c08M6sIA5gF5+sRxqak2Qs=" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/js/tempusdominus-bootstrap-4.min.js" integrity="sha256-z0oKYg6xiLq3yJGsp/LsY9XykbweQlHl42jHv2XTBz4=" crossorigin="anonymous"></script>
+
+        {# Django Tempus Dominus assets are included in `{{ form.media }}` #}
+        {{ form.media }}
+    </head>
+    {% if appointment_form.errors %}
+        {% for field in appointment_form %}
+            {% for error in field.errors %}
+                <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                </div>
+            {% endfor %}
+        {% endfor %}
+        {% for error in appointment_form.non_field_errors %}
+            <div class="alert alert-danger">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endif %}
+    <h1>Agendar Serviço</h1>
+    <form id="main-form" class="my-4 ml-3" action="{% url 'schedule' %}" method="post">
+        {% csrf_token %}
+        <h3>Cliente</h3>
+        {{ customer_form|crispy }}
+        <h3>Mecânico</h3>
+        {{ mechanic_form|crispy }}
+        <h3>Serviço</h3>
+        {{ appointment_form|crispy }}
+        <input class="btn btn-primary" type="submit" name="" value="Enviar notificação">
+    </form>
+{% endblock %}
