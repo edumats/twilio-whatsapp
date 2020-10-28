@@ -31,7 +31,11 @@
         <tbody>
             {% for appointment in customer.appointment_set.all %}
                 <tr>
-                    <td>{{appointment.get_status_display}}</td>
+                    <td>
+                        <a href="{{appointment.get_absolute_url}}">
+                            {{appointment.get_status_display}}
+                        </a>
+                    </td>
                     <td>{{appointment.get_type_display}}</td>
                     <td>{{appointment.mechanic}}</td>
                     <td>{{appointment.date_initiated}}</td>

@@ -1,0 +1,15 @@
+{% extends "bot_app/layout.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Fale com o Bike123
+{% endblock %}
+
+{% block body %}
+    <h1>Fale com o Bike123</h1>
+    <form id="main-form" class="mt-4 ml-3" action="{% url 'contato' %}" method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input class="btn btn-primary" type="submit"  value="Enviar">
+    </form>
+{% endblock %}

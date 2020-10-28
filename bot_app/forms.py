@@ -6,14 +6,13 @@ from django.forms import ModelForm
 from .models import Appointment, Customer, Mechanic
 
 from tempus_dominus.widgets import DateTimePicker
+from .gmail import send_gmail
 
 class ReschedulingForm(forms.Form):
     DIA = 'D'
-    HORA = 'H'
     ENDEREÇO = 'E'
     RESCHEDULE = [
-        (DIA, 'Não posso receber o mecânico nesse dia'),
-        (HORA, 'Não posso receber o mecânico nesse horário, mas posso nesse dia'),
+        (DIA, 'Alterar dia e horário do serviço'),
         (ENDEREÇO, 'O endereço onde será realizado o serviço está errado')
     ]
     customer_issue = forms.ChoiceField(label='Selecione o motivo para reagendamento', choices=RESCHEDULE, widget=forms.RadioSelect)
@@ -71,3 +70,15 @@ class CreateMechanic(ModelForm):
         labels = {
             'name_mechanic': 'Nome do mecânico'
         }
+
+class ContactForm(forms.Form):
+    nome = forms.CharField(max_length=200)
+    email = forms.EmailField()
+    mensagem = forms.CharField(widget=forms.Textarea)
+
+    def send_email(self):
+        nome_cliente = self.cleaned_data['nome']
+        email = self.cleaned_data['email']
+        mensagem_cliente = self.cleaned_data['mensagem']
+        mensagem = f'Cliente: {nome_cliente}\nE-mail: {email}\nMensagem:\n{mensagem_cliente}'
+        send_gmail('rafael.tales@bike123.com.br', f'Mensagem do {nome_cliente}', mensagem)

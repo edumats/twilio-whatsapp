@@ -4,7 +4,7 @@ from datetime import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.views import generic
-from django.views.generic.edit import UpdateView
+from django.views.generic.edit import UpdateView, FormView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages
@@ -15,20 +15,22 @@ import emoji
 
 from .models import Appointment, Customer, Mechanic, Message
 from .sms import send_sms
-from .forms import ReschedulingForm, CreateAppointment, CreateUser, CreateMechanic, CustomerServiceForm, ChangeApppointmentStatus
+from .forms import ReschedulingForm, CreateAppointment, CreateUser, CreateMechanic, CustomerServiceForm, ChangeApppointmentStatus, ContactForm
 from .gmail import send_gmail
 from .whatsapp import send_whatsapp
 
+valid_link = 'https://87e8d29f0e14.ngrok.io'
+
 def schedule(request):
     if request.method == 'POST':
-        # Populate Customer object if customer exists, otherwise populate with POST data
+        # Populate with a Customer object if customer already exists, otherwise populate with POST data
         try:
             customer_phone = request.POST.get('phone_number', 'no phone')
             customer = Customer.objects.get(phone_number=customer_phone)
             customer_form = CreateUser(request.POST, instance=customer)
         except Customer.DoesNotExist:
             customer_form = CreateUser(request.POST)
-        # Populate Mechanic if exists, otherwise populate with POST data
+        # Populate with Mechanic object if mechanic already exists, otherwise populate with POST data
         try:
             mechanic_name = request.POST.get('name_mechanic', 'no mechanic')
             mechanic = Mechanic.objects.get(name_mechanic=mechanic_name)
@@ -41,7 +43,7 @@ def schedule(request):
         if appointment_form.is_valid() and customer_form.is_valid() and mechanic_form.is_valid():
             new_customer = customer_form.save()
             new_mechanic = mechanic_form.save()
-            appointment_datetime =  appointment_form.cleaned_data['date_scheduled']
+            appointment_datetime = appointment_form.cleaned_data['date_scheduled']
             # Format data to a Brazilian standard
             readable_date = appointment_datetime.strftime('%d/%m/%Y %H:%M')
             service_type = appointment_form.cleaned_data['type']
@@ -52,24 +54,23 @@ def schedule(request):
                 date_scheduled=appointment_datetime,
                 type=service_type
             )
-            # new_appointment.save()
+
             customer_name = customer_form.cleaned_data['name']
             customer_address = customer_form.cleaned_data['address']
             mechanic_name = mechanic_form.cleaned_data['name_mechanic']
-            # custom_link = f'http://72c9833bc4d5.ngrok.io/reschedule/{new_appointment.id}'
             custom_link = new_appointment.get_reschedule_url()
-            service_type = 'revisão'
-            message = f'Olá, {customer_name}. Aqui é o robô do Bike123. O serviço de {service_type} será realizado em {readable_date} no endereço {customer_address} pelo mecânico {mechanic_name}. Caso não possa receber o mecânico ou as informações estejam incorretas, acesso o link: {custom_link}'
+            service_type = new_appointment.get_type_display()
+            message = f'Olá, {customer_name}. Aqui é o assistente virtual do Bike123. O serviço de {service_type} será realizado em {readable_date} no endereço {customer_address} pelo mecânico {mechanic_name}. Caso não possa receber o mecânico ou se as informações estiverem incorretas, responda para este número escrevendo a mensagem "ajuda".'
 
             # Send SMS
             # send_sms(message, customer_phone)
             customer_email = customer_form.cleaned_data['email']
             print(message, customer_email)
             # Send E-mail
-            # send_gmail(customer_email, 'Agendamento Bike123', message)
+            send_gmail(customer_email, 'Agendamento Bike123', message)
             # customer_phone = customer_form.cleaned_data['phone_number']
             # Send Whatsapp
-            # send_whatsapp(message, customer_phone)
+            send_whatsapp(message, customer_phone)
             messages.success(request, 'E-mail e whatsapp enviados para o cliente')
             return redirect('schedule')
 
@@ -97,28 +98,29 @@ def reschedule(request, id=''):
             check_id = request.POST.get('customer-id', '')
             issue = request.POST.get('customer_issue', '')
             appointment = Appointment.objects.get(id=check_id)
-            custom_link = f'http://72c9833bc4d5.ngrok.io/reschedule/{appointment.id}'
+            readable_date = appointment.date_scheduled.strftime('%d/%m/%Y %H:%M')
+            custom_link = f'{valid_link}/reschedule/{appointment.id}'
 
             if issue == 'D':
                 # Customer needs to reschedule the appointment day
                 appointment.status = 'RE'
                 appointment.save()
 
-                message_day = f'O cliente {appointment.customer} precisa remarcar o dia do atendimento {custom_link} marcado para {appointment.date_scheduled} com o mecânico {appointment.mechanic}'
+                message_day = f'Cliente {appointment.customer} precisa remarcar o dia do atendimento {custom_link} marcado para {readable_date} com o mecânico {appointment.mechanic}'
                 send_gmail('rafael.tales@bike123.com.br', 'Cliente precisa remarcar o dia', message_day)
             elif issue == 'H':
                 # Customer needs to reschedule the appointment hour
                 appointment.status = 'RE'
                 appointment.save()
 
-                message_time = f'O cliente {appointment.customer} precisa remarcar o horário do atendimento {custom_link} marcado para {appointment.date_scheduled} com o mecânico {appointment.mechanic}'
+                message_time = f'O cliente {appointment.customer} precisa remarcar o horário do atendimento {custom_link} marcado para {readable_date} com o mecânico {appointment.mechanic}'
                 send_gmail('rafael.tales@bike123.com.br', 'Cliente precisa remarcar o horário', message_time)
             elif issue == 'E':
                 # Customer reports that appointment has wrong information
                 appointment.status = 'WI'
                 appointment.save()
 
-                message_address = f'O atendimento {custom_link} do cliente {appointment.customer} marcado para {appointment.date_scheduled} com o mecânico {appointment.mechanic} está com o endereço incorreto'
+                message_address = f'O atendimento {custom_link} do cliente {appointment.customer} marcado para {readable_date} com o mecânico {appointment.mechanic} está com o endereço incorreto'
                 send_gmail('rafael.tales@bike123.com.br', 'Cliente está com endereço incorreto', message_address)
             # Message to customer after sucessfuly submitting the form
             messages.success(request, 'Obrigado, vamos retornar em breve com o novo agendamento')
@@ -164,9 +166,9 @@ def bot(request):
 
 Você pode me dar os seguintes comandos:
 
-:arrow_right: *"agendar":* Reagendar um serviço
+:arrow_right: *"reagendar":* Reagendar um serviço
 :arrow_right: *"checar"*: Consultar situação do meu serviço
-:arrow_right: *"avaliar"*: Avalie o Bike123  :white_check_mark:
+:arrow_right: *"avaliar"*: Avalie o Bike123
 :arrow_right: *"mensagem"*: Quero falar com alguém do Bike123
                 """,
                 use_aliases=True
@@ -174,16 +176,28 @@ Você pode me dar os seguintes comandos:
                 msg.body(response)
                 responded = True
 
-            elif 'agendar' in incoming_msg:
-                msg.body('Link para reagendar serviço')
-                responded = True
-            elif 'checar' in incoming_msg:
+            elif 'reagendar' in incoming_msg:
                 try:
                     get_customer = Customer.objects.get(phone_number=from_phone[9:])
+                    appointment = get_customer.appointment_set.filter(status='ST').first()
+                except Customer.DoesNotExist:
+                    msg.body('Você não tem serviços ativos')
+                link = f'{valid_link}/reschedule/{appointment.id}'
+                msg.body(f'Reagende seu serviço através do link: {link}')
+                responded = True
+            elif 'checar' in incoming_msg:
+                print('checking')
+                try:
+
+                    get_customer = Customer.objects.get(phone_number=from_phone[9:])
+                    print(f'Checking number: {get_customer.phone_number}')
                     appointments = get_customer.appointment_set.filter(status='ST')
                     for appointment in appointments:
-                        msg.body(f'{appointment.get_type_display} agendado para {appointment.get_date_scheduled_display} - Mecânico {appointment.mechanic}')
+                        date = appointment.date_scheduled.strftime('%d/%m/%Y %H:%M')
+                        msg.body(f'{appointment.get_type_display()} agendado para {date} - Mecânico {appointment.mechanic}')
+                        print(f'created response: {appointment.get_type_display()} agendado para {date} - Mecânico {appointment.mechanic}')
                 except Customer.DoesNotExist:
+                    print('sem serviços ativos')
                     msg.body('Você não tem serviços ativos.')
                 responded = True
             elif 'avaliar' in incoming_msg:
@@ -191,7 +205,7 @@ Você pode me dar os seguintes comandos:
                 msg.body(response)
                 responded = True
             elif 'mensagem' in incoming_msg:
-                msg.body('Link para página de contato')
+                msg.body(f'Entre em contato conosco através do link: {valid_link}/contact')
                 responded = True
 
             if not responded:
@@ -227,3 +241,12 @@ class AppointmentDetailView(UpdateView):
 
 class CustomerDetailView(generic.DetailView):
     model = Customer
+
+class ContactView(FormView):
+    template_name = 'bot_app/contato.html'
+    form_class = ContactForm
+
+    def form_valid(self, form):
+        form.send_email()
+        messages.success(self.request, 'Mensagem enviada! Em breve entraremos em contato')
+        return redirect('contato')
