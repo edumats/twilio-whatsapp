@@ -15,7 +15,7 @@ import emoji
 
 from .models import Appointment, Customer, Mechanic, Message
 from .sms import send_sms
-from .forms import ReschedulingForm, CreateAppointment, CreateUser, CreateMechanic, CustomerServiceForm, ChangeApppointmentStatus, ContactForm
+from .forms import ReschedulingForm, CreateAppointment, CreateCustomer, CreateMechanic, CustomerServiceForm, ChangeApppointmentStatus, ContactForm
 from .gmail import send_gmail
 from .whatsapp import send_whatsapp
 
@@ -27,9 +27,9 @@ def schedule(request):
         try:
             customer_phone = request.POST.get('phone_number', 'no phone')
             customer = Customer.objects.get(phone_number=customer_phone)
-            customer_form = CreateUser(request.POST, instance=customer)
+            customer_form = CreateCustomer(request.POST, instance=customer)
         except Customer.DoesNotExist:
-            customer_form = CreateUser(request.POST)
+            customer_form = CreateCustomer(request.POST)
         # Populate with Mechanic object if mechanic already exists, otherwise populate with POST data
         try:
             mechanic_name = request.POST.get('name_mechanic', 'no mechanic')
@@ -56,11 +56,12 @@ def schedule(request):
             )
 
             customer_name = customer_form.cleaned_data['name']
-            customer_address = customer_form.cleaned_data['address']
+            customer_address = appointment_form.cleaned_data['address']
             mechanic_name = mechanic_form.cleaned_data['name_mechanic']
             custom_link = new_appointment.get_reschedule_url()
             service_type = new_appointment.get_type_display()
             message = f'Olá, {customer_name}. Aqui é o assistente virtual do Bike123. O serviço de {service_type} será realizado em {readable_date} no endereço {customer_address} pelo mecânico {mechanic_name}. Caso não possa receber o mecânico ou se as informações estiverem incorretas, responda para este número escrevendo a mensagem "ajuda".'
+
 
             # Send SMS
             # send_sms(message, customer_phone)
@@ -85,7 +86,7 @@ def schedule(request):
         context = {
             # 'form': CustomerServiceForm()
             'appointment_form': CreateAppointment(initial={'date_scheduled': datetime.today()}),
-            'customer_form': CreateUser(initial={'phone_number': '+55'}),
+            'customer_form': CreateCustomer(initial={'phone_number': '+55'}),
             'mechanic_form': CreateMechanic(),
         }
         return render(request, 'bot_app/schedule.html', context)

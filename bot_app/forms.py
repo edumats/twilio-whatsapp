@@ -29,11 +29,18 @@ class CustomerServiceForm(forms.Form):
 class CreateAppointment(ModelForm):
     class Meta:
         model = Appointment
-        fields = ['type','date_scheduled', 'comments']
+        fields = ['mechanic','type','date_scheduled', 'comments', 'address', 'complement', 'city', 'state', 'zip_code', 'reference']
         labels = {
+            'mechanic': 'Mecânico responsável',
             'type': 'Tipo de serviço',
             'date_scheduled': 'Quando serviço será realizado',
-            'comments': 'Observações'
+            'comments': 'Observações',
+            'address': 'Endereço do cliente',
+            'complement': 'Complemento',
+            'city': 'Cidade',
+            'state': 'Estado',
+            'zip_code': 'CEP',
+            'reference': 'Referência'
         }
         widgets = {
             'date_scheduled': DateTimePicker(
@@ -50,17 +57,17 @@ class CreateAppointment(ModelForm):
         }
 
 class ChangeApppointmentStatus(ModelForm):
-    model = Appointment
-    fields = 'status'
+    class Meta:
+        model = Appointment
+        fields = ('status',)
 
-class CreateUser(ModelForm):
+class CreateCustomer(ModelForm):
     class Meta:
         model = Customer
-        fields = '__all__'
+        fields = ['name', 'phone_number', 'email']
         labels = {
-            'name': 'Nome do cliente',
-            'phone_number': 'Telefone do cliente',
-            'address': 'Endereço do cliente'
+            'name': 'Nome',
+            'phone_number': 'Telefone'
         }
 
 class CreateMechanic(ModelForm):
@@ -68,7 +75,20 @@ class CreateMechanic(ModelForm):
         model = Mechanic
         fields = '__all__'
         labels = {
-            'name_mechanic': 'Nome do mecânico'
+            'name': 'Nome',
+            'phone_number': 'Telefone',
+            'cpf': 'CPF',
+            'rg': 'RG',
+            'address': 'Endereço',
+            'complement': 'Complemento',
+            'city': 'Cidade',
+            'state': 'Estado',
+            'zip_code': 'CEP',
+            'bank': 'Banco',
+            'branch': 'Agência',
+            'account_number': 'Número da conta',
+            'account_owner_name': 'Nome do proprietário da conta',
+            'owner_id': 'Documento do proprietário da conta'
         }
 
 class ContactForm(forms.Form):
