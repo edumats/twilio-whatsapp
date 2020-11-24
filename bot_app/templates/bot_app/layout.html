@@ -25,19 +25,27 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-light bg-primary nav nav-masthead">
-        <div class='container'>
+
             <a class="navbar-brand" href="{% url 'schedule' %}">Painel Bike123</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
             </button>
+
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <div class="navbar-nav ml-auto">
+                <div class="navbar-nav mr-auto">
                     <li class="nav-item active">
                         <a class="nav-link" href="{% url 'appointments' %}">Serviços</a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Mecânicos</a>
+                        <div class="dropdown-menu" aria-labelledy="navbarDropdown">
+                            <a class="dropdown-item" href="{% url 'create-mechanic' %}">Cadastrar Mecânico</a>
+                            <a class="dropdown-item" href="{% url 'mechanics' %}">Ver Mecânicos</a>
+                        </div>
+                    </li>
                 </div>
             </div>
-        </div>
+
     </nav>
     <!-- Server side alerts -->
     {% if messages %}

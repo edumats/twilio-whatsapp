@@ -1,0 +1,17 @@
+{% extends "bot_app/layout.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Editar Mecânico
+{% endblock %}
+
+{% block body %}
+    <a href="{% url 'mechanics' %}">Voltar para lista de mecânicos</a>
+    <hr>
+    <h1>Editar mecânico</h1>
+    <form id="main-form" class="my-4 ml-3" method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <input class="btn btn-primary" type="submit"  value="Salvar">
+    </form>
+{% endblock %}

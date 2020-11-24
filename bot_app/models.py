@@ -2,18 +2,20 @@ import uuid
 
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.urls import reverse
 from .validators import validate_date
 from .br_state_model import BrazilianState
 
 
 class CommonUserInfo(models.Model):
-    name = models.CharField(max_length=150, help_text='Nome')
+    name = models.CharField(max_length=150, help_text='Nome e sobrenome', verbose_name='Nome')
     phone_number = models.CharField(
         max_length=15,
         unique=True,
-        help_text='Número de telefone celular com DDD, somente números'
+        help_text='Número de telefone celular com DDD, somente números. Ex: 11987654321',
+        verbose_name='Número telefone'
     )
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, verbose_name='E-mail')
 
     class Meta:
         abstract = True
@@ -23,63 +25,92 @@ class Customer(CommonUserInfo):
     date_created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'Cliente: {self.name} {self.last_name} - {self.phone_number} - {self.email}'
+        return f'{self.name} - {self.phone_number} - {self.email}'
 
     def get_absolute_url(self):
-        return f'/customer/{self.id}'
+        return reverse('customer-detail', kwargs={'pk':self.pk})
 
 class Mechanic(CommonUserInfo):
     date_created = models.DateTimeField(auto_now_add=True)
     cpf = models.CharField(
         max_length=11,
         blank=True,
-        help_text='CPF, sem pontos ou traços'
+        help_text='CPF, com pontos e traços',
+        verbose_name='CPF'
     )
     rg = models.CharField(
         max_length=14,
         blank=True,
-        help_text='RG, sem pontos ou traços'
+        help_text='RG, com pontos e traços',
+        verbose_name='RG'
     )
     address = models.CharField(
         max_length=200,
         blank=True,
-        help_text='Endereço, com número. Ex: Rua das Rosas, 210'
+        help_text='Endereço, com número. Ex: Rua das Rosas, 210',
+        verbose_name='Endereço'
     )
     complement = models.CharField(
         max_length=200,
         blank=True,
-        help_text='Complemento do endereço, se houver'
+        help_text='Complemento do endereço, se houver',
+        verbose_name='Complemento'
     )
-    city = models.CharField(max_length=50, blank=True, help_text='Cidade')
+    city = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text='Cidade. Ex: São Paulo',
+        verbose_name='Cidade'
+    )
     state = models.CharField(
         choices=BrazilianState.choices,
         max_length=2,
         blank=True,
-        help_text='Estado'
+        verbose_name='Estado'
     )
-    zip_code = models.CharField(max_length=10, blank=True, help_text='CEP')
+    zip_code = models.CharField(
+        max_length=10,
+        blank=True,
+        help_text='CEP, com traços',
+        verbose_name='CEP'
+    )
     # Bank account information
-    bank = models.CharField(max_length=50, blank=True, help_text='Nome do banco')
-    branch = models.CharField(max_length=10, blank=True, help_text='Agência')
+    bank = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text='Nome do banco',
+        verbose_name='Banco'
+    )
+    branch = models.CharField(
+        max_length=10,
+        blank=True,
+        help_text='Agência',
+        verbose_name='Agência'
+    )
     account_number = models.CharField(
         max_length=15,
+        help_text='Número da conta, com traços',
         blank=True,
-        help_text='Número da conta'
+        verbose_name='Número da conta'
     )
     account_owner_name = models.CharField(
         max_length=100,
-        help_text='Nome do proprietário da conta'
+        help_text='Nome completo do proprietário da conta',
+        blank=True,
+        verbose_name='Proprietário da conta'
     )
     owner_id = models.CharField(
         max_length=20,
-        help_text='CPF ou CNPJ do proprietário da conta'
+        help_text='CPF ou CNPJ do proprietário da conta',
+        blank=True,
+        verbose_name='Documento do proprietário'
     )
 
     def __str__(self):
-        return f'Mecânico: {self.name} {self.last_name} - {self.phone_number} - {self.email}'
+        return f'{self.name} - {self.city} / {self.state}'
 
     def get_absolute_url(self):
-        return f'/mechanics/{self.id}'
+        return reverse('mechanic-detail', kwargs={'pk': self.pk})
 
 
 class Appointment(models.Model):
@@ -140,42 +171,42 @@ class Appointment(models.Model):
         max_length=2,
         default=STARTED
     )
-    comments = models.TextField(
-        help_text='Observações sobre o serviço',
-        blank=True
-    )
     address = models.CharField(
         max_length=200,
-        blank=True,
-        help_text='Endereço do serviço, com número. Ex: Rua das Rosas, 210'
+        help_text='Endereço onde será realizado o serviço. Ex: Rua das Rosas, 210',
+        verbose_name='Endereço do serviço'
     )
     complement = models.CharField(
         max_length=200,
         blank=True,
         help_text='Complemento do endereço, se houver'
     )
-    city = models.CharField(max_length=50, blank=True, help_text='Cidade')
+    city = models.CharField(max_length=50, help_text='Cidade')
     state = models.CharField(
         choices=BrazilianState.choices,
         max_length=2,
-        blank=True,
         help_text='Estado'
     )
-    zip_code = models.CharField(max_length=10, blank=True, help_text='CEP')
+    zip_code = models.CharField(max_length=10, help_text='CEP, sem traço')
     reference = models.CharField(
         max_length=200,
         blank=True,
         help_text='Referência. Ex: Próximo ao metrô Ana Rosa'
+    )
+    comments = models.TextField(
+        help_text='Observações sobre o serviço',
+        blank=True
     )
 
     def __str__(self):
         return f'{self.type} agendado para {self.date_scheduled} - Mecânico {self.mechanic}'
 
     def get_absolute_url(self):
-        return f'/appointments/{self.id}'
+        return reverse('appointment-detail', kwargs={'id': self.id})
 
     def get_reschedule_url(self):
-        return f'/reschedule/{self.id}'
+        return reverse('reschedule', kwargs={'id': self. id})
+
 
 class Review(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)

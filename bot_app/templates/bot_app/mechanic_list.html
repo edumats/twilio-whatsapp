@@ -1,0 +1,36 @@
+{% extends "bot_app/layout.html" %}
+
+{% block title %}
+    Lista de Serviços Agendados
+{% endblock %}
+
+{% block body %}
+    <h1 class="my-4">Lista de Mecânicos</h1>
+    <a class='btn btn-primary' href="{% url 'export-mechanics' %}">Gerar Relatório</a>
+    {% if mechanic_list %}
+        <table class="table table-striped my-4">
+            <thead>
+                <tr>
+                    <th scope="col">Nome</th>
+                    <th scope="col">Cidade</th>
+                    <th scope="col">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mechanic in mechanic_list %}
+                    <tr>
+                        <td>
+                            <a href="{{mechanic.get_absolute_url}}">
+                                {{mechanic.name}}
+                            </a>
+                        </td>
+                        <td>{{mechanic.city}}</td>
+                        <td>{{mechanic.get_state_display}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Não há mecânicos cadastrados</p>
+    {% endif %}
+{% endblock %}

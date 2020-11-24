@@ -14,7 +14,6 @@
     <h3 class="my-3">Contato</h3>
     <p><strong>Telefone: </strong> {{ customer.phone_number }}</p>
     <p><strong>E-mail: </strong> {{ customer.email }}</p>
-    <p><strong>Endereço: </strong> {{ customer.address }}</p>
     <hr>
     <h3>Serviços Realizados</h3>
     {% if customer.appointment_set.all %}

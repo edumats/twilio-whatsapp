@@ -1,0 +1,70 @@
+{% extends "bot_app/layout.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Detalhes do Mecânico
+{% endblock %}
+
+{% block body %}
+    <a href="{% url 'mechanics' %}">Voltar para lista de mecânicos</a>
+    <hr>
+    <a href='{% url 'update-mechanic' mechanic.pk %}'>Editar Mecânico</a>
+    <h1 class="my-3">Detalhes do Mecânico</h1>
+
+    <h2>{{ mechanic.name }}</h2>
+
+    <p><strong>Cadastrado em: </strong> {{ mechanic.date_created|date:'N d Y, H:i A' }}</p>
+
+
+    <h3 class="my-3">Contato</h3>
+    <p><strong>Telefone: </strong> {{ mechanic.phone_number }}</p>
+    <p><strong>E-mail: </strong> {{ mechanic.email }}</p>
+    <p><strong>Endereço: </strong> {{ mechanic.address }}</p>
+    <p><strong>Complemento: </strong> {{ mechanic.complement }}</p>
+    <p><strong>Cidade / Estado: </strong> {{ mechanic.city }} / {{ mechanic.state }}</p>
+    <p><strong>CEP: </strong> {{ mechanic.zip_code }}</p>
+    <hr>
+    <h3>Dados Pessoais</h3>
+    <p><strong>CPF: </strong>{{ mechanic.cpf }}</p>
+    <p><strong>RG: </strong>{{ mechanic.rg }}</p>
+    <hr>
+    <h3>Dados de Pagamento</h3>
+    <p><strong>Banco: </strong>{{ mechanic.bank }}</p>
+    <p><strong>Agência: </strong>{{ mechanic.branch }}</p>
+    <p><strong>Conta: </strong>{{ mechanic.account_number }}</p>
+    <p><strong>Proprietário da conta: </strong>{{ mechanic.account_owner_name }}</p>
+    <p><strong>Documento do proprietário: </strong>{{ mechanic.owner_id }}</p>
+    <hr>
+    <h3>Serviços Realizados</h3>
+    {% if mechanic.appointment_set.all %}
+        <table class="table table-striped my-4">
+            <thead>
+                <tr>
+                    <th scope="col">Status</th>
+                    <th scope="col">Serviço</th>
+                    <th scope="col">Mecânico</th>
+                    <th scope="col">Iniciado</th>
+                    <th scope="col">Agendado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for appointment in mechanic.appointment_set.all %}
+                    <tr>
+                        <td>
+                            <a href="{{appointment.get_absolute_url}}">
+                                {{appointment.get_status_display}}
+                            </a>
+                        </td>
+                        <td>{{appointment.get_type_display}}</td>
+                        <td>{{appointment.mechanic}}</td>
+                        <td>{{appointment.date_initiated}}</td>
+                        <td>{{appointment.date_scheduled}}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>O mecânico ainda não realizou serviços</p>
+    {% endif %}
+
+{% endblock %}

@@ -39,8 +39,6 @@
         {% csrf_token %}
         <h3>Cliente</h3>
         {{ customer_form|crispy }}
-        <h3>Mecânico</h3>
-        {{ mechanic_form|crispy }}
         <h3>Serviço</h3>
         {{ appointment_form|crispy }}
         <input class="btn btn-primary" type="submit" name="" value="Enviar notificação">

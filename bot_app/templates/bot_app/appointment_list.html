@@ -6,6 +6,7 @@
 
 {% block body %}
     <h1 class="my-4">Lista de Serviços</h1>
+    <a class='btn btn-primary' href="{% url 'export-appointments' %}">Gerar Relatório</a>
     {% if appointment_list %}
         <table class="table table-striped my-4">
             <thead>
@@ -29,7 +30,7 @@
                         <td>{{appointment.get_type_display}}</td>
                         <td><a href="{% url 'customer-detail' appointment.customer.pk %}">{{appointment.customer}}</a></td>
                         <td>{{appointment.mechanic}}</td>
-                        <td>{{appointment.date_initiated|date:'N d, H:i A'}}</td>
+                        <td>{{appointment.date_created|date:'N d, H:i A'}}</td>
                         <td>{{appointment.date_scheduled|date:'N d, H:i A'}}</td>
                     </tr>
                 {% endfor %}

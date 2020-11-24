@@ -1,10 +1,11 @@
 import os
+import csv
 from datetime import datetime
 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from django.views import generic
-from django.views.generic.edit import UpdateView, FormView
+from django.views.generic.edit import UpdateView, FormView, CreateView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages
@@ -15,11 +16,11 @@ import emoji
 
 from .models import Appointment, Customer, Mechanic, Message
 from .sms import send_sms
-from .forms import ReschedulingForm, CreateAppointment, CreateCustomer, CreateMechanic, CustomerServiceForm, ChangeApppointmentStatus, ContactForm
+from .forms import ReschedulingForm, CreateAppointment, CreateCustomer, CustomerServiceForm, ChangeApppointmentStatus, ContactForm
 from .gmail import send_gmail
 from .whatsapp import send_whatsapp
 
-valid_link = 'https://87e8d29f0e14.ngrok.io'
+valid_link = 'https://67c765068907.ngrok.io'
 
 def schedule(request):
     if request.method == 'POST':
@@ -30,34 +31,22 @@ def schedule(request):
             customer_form = CreateCustomer(request.POST, instance=customer)
         except Customer.DoesNotExist:
             customer_form = CreateCustomer(request.POST)
-        # Populate with Mechanic object if mechanic already exists, otherwise populate with POST data
-        try:
-            mechanic_name = request.POST.get('name_mechanic', 'no mechanic')
-            mechanic = Mechanic.objects.get(name_mechanic=mechanic_name)
-            mechanic_form = CreateMechanic(request.POST, instance=mechanic)
-        except Mechanic.DoesNotExist:
-            mechanic_form = CreateMechanic(request.POST)
 
         appointment_form = CreateAppointment(request.POST)
 
-        if appointment_form.is_valid() and customer_form.is_valid() and mechanic_form.is_valid():
+        if appointment_form.is_valid() and customer_form.is_valid():
             new_customer = customer_form.save()
-            new_mechanic = mechanic_form.save()
-            appointment_datetime = appointment_form.cleaned_data['date_scheduled']
             # Format data to a Brazilian standard
-            readable_date = appointment_datetime.strftime('%d/%m/%Y %H:%M')
-            service_type = appointment_form.cleaned_data['type']
-            # Create new appointment
-            new_appointment = Appointment.objects.create(
-                customer=new_customer,
-                mechanic=new_mechanic,
-                date_scheduled=appointment_datetime,
-                type=service_type
-            )
 
+            # Create new appointment
+            new_appointment = appointment_form.save()
+            new_appointment.customer = new_customer
+            new_appointment.save()
+            print(new_appointment.customer)
             customer_name = customer_form.cleaned_data['name']
             customer_address = appointment_form.cleaned_data['address']
-            mechanic_name = mechanic_form.cleaned_data['name_mechanic']
+            mechanic_name = new_appointment.mechanic.name
+            readable_date = new_appointment.date_scheduled.strftime('%d/%m/%Y %H:%M')
             custom_link = new_appointment.get_reschedule_url()
             service_type = new_appointment.get_type_display()
             message = f'Olá, {customer_name}. Aqui é o assistente virtual do Bike123. O serviço de {service_type} será realizado em {readable_date} no endereço {customer_address} pelo mecânico {mechanic_name}. Caso não possa receber o mecânico ou se as informações estiverem incorretas, responda para este número escrevendo a mensagem "ajuda".'
@@ -71,14 +60,13 @@ def schedule(request):
             send_gmail(customer_email, 'Agendamento Bike123', message)
             # customer_phone = customer_form.cleaned_data['phone_number']
             # Send Whatsapp
-            send_whatsapp(message, customer_phone)
+            # send_whatsapp(message, customer_phone)
             messages.success(request, 'E-mail e whatsapp enviados para o cliente')
             return redirect('schedule')
 
         context = {
             'appointment_form': appointment_form,
             'customer_form': customer_form,
-            'mechanic_form': mechanic_form
         }
         return render(request, 'bot_app/schedule.html', context)
     else:
@@ -86,8 +74,7 @@ def schedule(request):
         context = {
             # 'form': CustomerServiceForm()
             'appointment_form': CreateAppointment(initial={'date_scheduled': datetime.today()}),
-            'customer_form': CreateCustomer(initial={'phone_number': '+55'}),
-            'mechanic_form': CreateMechanic(),
+            'customer_form': CreateCustomer(initial={'phone_number': '+55'})
         }
         return render(request, 'bot_app/schedule.html', context)
 
@@ -231,7 +218,7 @@ Você pode me dar os seguintes comandos:
 
 class AppointmentListView(generic.ListView):
     model = Appointment
-    ordering = ['-date_initiated']
+    ordering = ['-date_created']
 
 class AppointmentDetailView(UpdateView):
     fields = ['status']
@@ -251,3 +238,19 @@ class ContactView(FormView):
         form.send_email()
         messages.success(self.request, 'Mensagem enviada! Em breve entraremos em contato')
         return redirect('contato')
+
+class MechanicDetailView(generic.DetailView):
+    model = Mechanic
+
+class MechanicListView(generic.ListView):
+    model = Mechanic
+
+class MechanicCreate(CreateView):
+    template_name_suffix = '_create_form'
+    model = Mechanic
+    fields = '__all__'
+
+class MechanicUpdate(UpdateView):
+    template_name_suffix = '_update_form'
+    model = Mechanic
+    fields = '__all__'

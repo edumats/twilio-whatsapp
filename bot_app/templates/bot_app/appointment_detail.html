@@ -16,7 +16,7 @@
     <p><strong>Endereço do serviço: </strong>{{ appointment.customer.address }}</p>
     <hr>
     <p><strong>Mecânico: </strong> {{ appointment.mechanic }}</p>
-    <p><strong>Iniciado: </strong> {{ appointment.date_initiated|date:'N d Y, H:i A' }}</p>
+    <p><strong>Iniciado: </strong> {{ appointment.date_created|date:'N d Y, H:i A' }}</p>
     <p><strong>Agendado: </strong> {{ appointment.date_scheduled|date:'N d Y, H:i A' }}</p>
     <form class="mb-2" method="post">
         {% csrf_token %}
