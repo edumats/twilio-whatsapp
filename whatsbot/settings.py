@@ -25,7 +25,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'cg#p$g+j9tax!#a3cup@1$8obt2_+&k3q+pmu
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '.ngrok.io', '.us-west-2.elasticbeanstalk.com']
+ALLOWED_HOSTS = ['127.0.0.1', '.ngrok.io', 'whatsbot-env.eba-bg38f43w.sa-east-1.elasticbeanstalk.com']
 
 
 # Application definition
@@ -80,11 +80,11 @@ WSGI_APPLICATION = 'whatsbot.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DATABASE_NAME'),
-        'USER': os.environ.get('DATABASE_USER'),
-        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-        'HOST': os.environ.get('DATABASE_HOST'),
-        'PORT': '5432',
+        'NAME': os.environ.get('RDS_DB_NAME'),
+        'USER': os.environ.get('RDS_USERNAME'),
+        'PASSWORD': os.environ.get('RDS_PASSWORD'),
+        'HOST': os.environ.get('RDS_HOSTNAME'),
+        'PORT': os.environ,get('RDS_PORT'),
     }
 }
 
