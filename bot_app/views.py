@@ -42,7 +42,7 @@ def schedule(request):
             new_appointment = appointment_form.save()
             new_appointment.customer = new_customer
             new_appointment.save()
-            print(new_appointment.customer)
+
             customer_name = customer_form.cleaned_data['name']
             customer_address = appointment_form.cleaned_data['address']
             mechanic_name = new_appointment.mechanic.name
@@ -55,12 +55,13 @@ def schedule(request):
             # Send SMS
             # send_sms(message, customer_phone)
             customer_email = customer_form.cleaned_data['email']
-            print(message, customer_email)
+
             # Send E-mail
             send_gmail(customer_email, 'Agendamento Bike123', message)
-            # customer_phone = customer_form.cleaned_data['phone_number']
+
             # Send Whatsapp
-            # send_whatsapp(message, customer_phone)
+            customer_phone = customer_form.cleaned_data['phone_number']
+            send_whatsapp(message, customer_phone)
             messages.success(request, 'E-mail e whatsapp enviados para o cliente')
             return redirect('schedule')
 
