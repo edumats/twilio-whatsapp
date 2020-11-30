@@ -218,12 +218,10 @@ Você pode me dar os seguintes comandos:
             # Provided Twilio SID does not match
             return HttpResponse('')
 
-@login_required
 class AppointmentListView(generic.ListView):
     model = Appointment
     ordering = ['-date_created']
 
-@login_required
 class AppointmentDetailView(UpdateView):
     fields = ['status']
     template_name_suffix = '_detail'
@@ -231,11 +229,9 @@ class AppointmentDetailView(UpdateView):
     def get_object(self):
         return get_object_or_404(Appointment, id=self.kwargs.get('id'))
 
-@login_required
 class CustomerDetailView(generic.DetailView):
     model = Customer
 
-@login_required
 class ContactView(FormView):
     template_name = 'bot_app/contato.html'
     form_class = ContactForm
@@ -245,21 +241,17 @@ class ContactView(FormView):
         messages.success(self.request, 'Mensagem enviada! Em breve entraremos em contato')
         return redirect('contato')
 
-@login_required
 class MechanicDetailView(generic.DetailView):
     model = Mechanic
 
-@login_required
 class MechanicListView(generic.ListView):
     model = Mechanic
 
-@login_required
 class MechanicCreate(CreateView):
     template_name_suffix = '_create_form'
     model = Mechanic
     fields = '__all__'
 
-@login_required
 class MechanicUpdate(UpdateView):
     template_name_suffix = '_update_form'
     model = Mechanic
