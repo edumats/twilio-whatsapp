@@ -50,6 +50,9 @@ def schedule(request):
             custom_link = new_appointment.get_reschedule_url()
             service_type = new_appointment.get_type_display()
             message = f'Olá, {customer_name}. Aqui é o assistente virtual do Bike123. Recebemos sua solicitação. Temos um horário disponível para você. O serviço de {service_type} poderá ser  realizado em {readable_date} no endereço {customer_address} pelo mecânico {mechanic_name}. Se você puder nesta data e horário,  não precisa responder e o técnico lhe atenderá conforme combinado. Caso não possa recebê-lo na data sugerida ou se as informações estiverem incorretas, responda para este número escrevendo a mensagem "ajuda".'
+            message = f'Olá, {customer_name}. Aqui é o assistente virtual do Bike123. Recebemos sua solicitação. Temos um horário disponível para você. O serviço de {service_type} poderá ser  realizado em {readable_date} no endereço {customer_address} pelo mecânico {mechanic_name}. 
+Se você puder nesta data e horário,  não precisa responder e o técnico lhe atenderá conforme combinado.
+Caso não possa recebê-lo na data sugerida ou se as informações estiverem incorretas, responda para este número escrevendo a mensagem "ajuda".'
 
             # Send SMS
             # send_sms(message, customer_phone)
