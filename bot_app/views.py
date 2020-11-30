@@ -9,6 +9,7 @@ from django.views.generic.edit import UpdateView, FormView, CreateView
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
