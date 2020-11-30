@@ -20,7 +20,7 @@ from .forms import ReschedulingForm, CreateAppointment, CreateCustomer, Customer
 from .gmail import send_gmail
 from .whatsapp import send_whatsapp
 
-valid_link = 'whatsbot-env.eba-sgcgn7ui.sa-east-1.elasticbeanstalk.com'
+valid_link = 'https://protected-lowlands-90139.herokuapp.com/'
 
 def schedule(request):
     if request.method == 'POST':
