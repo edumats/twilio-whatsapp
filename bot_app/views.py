@@ -23,7 +23,7 @@ from .whatsapp import send_whatsapp
 
 valid_link = 'https://protected-lowlands-90139.herokuapp.com/'
 
-@login_required
+
 def schedule(request):
     if request.method == 'POST':
         # Populate with a Customer object if customer already exists, otherwise populate with POST data
