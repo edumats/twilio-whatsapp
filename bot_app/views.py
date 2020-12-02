@@ -10,6 +10,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from twilio.twiml.messaging_response import MessagingResponse
 from twilio.rest import Client
@@ -23,7 +24,7 @@ from .whatsapp import send_whatsapp
 
 valid_link = 'https://protected-lowlands-90139.herokuapp.com/'
 
-
+@login_required
 def schedule(request):
     if request.method == 'POST':
         # Populate with a Customer object if customer already exists, otherwise populate with POST data
@@ -218,18 +219,18 @@ Você pode me dar os seguintes comandos:
             # Provided Twilio SID does not match
             return HttpResponse('')
 
-class AppointmentListView(generic.ListView):
+class AppointmentListView(LoginRequiredMixin, generic.ListView):
     model = Appointment
     ordering = ['-date_created']
 
-class AppointmentDetailView(UpdateView):
+class AppointmentDetailView(LoginRequiredMixin, UpdateView):
     fields = ['status']
     template_name_suffix = '_detail'
 
     def get_object(self):
         return get_object_or_404(Appointment, id=self.kwargs.get('id'))
 
-class CustomerDetailView(generic.DetailView):
+class CustomerDetailView(LoginRequiredMixin, generic.DetailView):
     model = Customer
 
 class ContactView(FormView):
@@ -241,18 +242,18 @@ class ContactView(FormView):
         messages.success(self.request, 'Mensagem enviada! Em breve entraremos em contato')
         return redirect('contato')
 
-class MechanicDetailView(generic.DetailView):
+class MechanicDetailView(LoginRequiredMixin, generic.DetailView):
     model = Mechanic
 
-class MechanicListView(generic.ListView):
+class MechanicListView(LoginRequiredMixin, generic.ListView):
     model = Mechanic
 
-class MechanicCreate(CreateView):
+class MechanicCreate(LoginRequiredMixin, CreateView):
     template_name_suffix = '_create_form'
     model = Mechanic
     fields = '__all__'
 
-class MechanicUpdate(UpdateView):
+class MechanicUpdate(LoginRequiredMixin, UpdateView):
     template_name_suffix = '_update_form'
     model = Mechanic
     fields = '__all__'

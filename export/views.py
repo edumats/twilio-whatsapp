@@ -1,9 +1,11 @@
 import csv
 from django.http import HttpResponse
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 
 from bot_app.models import Appointment, Mechanic
 
+@login_required
 def export_appointment_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="lista_servicos.csv"'
@@ -44,6 +46,7 @@ def export_appointment_csv(request):
         ])
     return response
 
+@login_required
 def export_mechanics_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="lista_mecanicos.csv"'
