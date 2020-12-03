@@ -22,7 +22,7 @@ from .forms import ReschedulingForm, CreateAppointment, CreateCustomer, Customer
 from .gmail import send_gmail
 from .whatsapp import send_whatsapp
 
-valid_link = 'https://protected-lowlands-90139.herokuapp.com/'
+valid_link = 'https://bike123-whatsbot.herokuapp.com'
 
 @login_required
 def schedule(request):
@@ -187,7 +187,6 @@ Você pode me dar os seguintes comandos:
                     for appointment in appointments:
                         date = appointment.date_scheduled.strftime('%d/%m/%Y %H:%M')
                         msg.body(f'{appointment.get_type_display()} agendado para {date} - Mecânico {appointment.mechanic}')
-                        print(f'created response: {appointment.get_type_display()} agendado para {date} - Mecânico {appointment.mechanic}')
                 except Customer.DoesNotExist:
                     print('sem serviços ativos')
                     msg.body('Você não tem serviços ativos.')
